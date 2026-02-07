@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 
 from api.app.db.pool import get_conn, put_conn
 from api.app.repos.server_repo import DuplicateHostnameError, InvalidIPAddressError, InvalidStateError, NotFoundError, RepoError
-from api.app.services.server_service import create_server_service, ValidationError, delete_server_service, get_server_service, list_servers_service, update_server_service
+from api.app.services.server_service import create_server_service, delete_server_service, get_server_service, list_servers_service, update_server_service
 
 
 
@@ -15,14 +15,12 @@ def create_server():
     try:
         result = create_server_service(conn, payload)
         return jsonify(result), 201
-    except NotFoundError as e:
-        return jsonify({"error": e.message}), 404
     except DuplicateHostnameError as e:
         return jsonify({"error": str(e)}), 409
     except InvalidIPAddressError as e:
-        return jsonify({"error": e.message}), 400
+        return jsonify({"error": str(e)}), 400
     except InvalidStateError as e:
-        return jsonify({"error": e.message}), 400
+        return jsonify({"error": str(e)}), 400
     except RepoError as e:
         return jsonify({"error": str(e)}), 400
     finally:
@@ -58,13 +56,13 @@ def update_server(id: int):
         result = update_server_service(conn, id, payload)
         return jsonify(result), 200
     except NotFoundError as e:
-        return jsonify({"error": e.message}), 404
+        return jsonify({"error": str(e)}), 404
     except DuplicateHostnameError as e:
         return jsonify({"error": str(e)}), 409
     except InvalidIPAddressError as e:
-        return jsonify({"error": e.message}), 400
+        return jsonify({"error": str(e)}), 400
     except InvalidStateError as e:
-        return jsonify({"error": e.message}), 400
+        return jsonify({"error": str(e)}), 400
     finally:
         put_conn(conn)
 
@@ -76,7 +74,7 @@ def delete_server(id: int):
         delete_server_service(conn, id)
         return "", 204
     except NotFoundError as e:
-        return jsonify({"error": e.message}), 404
+        return jsonify({"error": str(e)}), 404
     finally:
         put_conn(conn)
 

@@ -19,7 +19,12 @@ def get_server_service(conn, id):
 
 def update_server_service(conn, id, payload):
     data = ServerUpdate.model_validate(payload)
-    row = update_server_repo(conn, id, data.hostname, str(data.ip_address), data.state.value)
+    fields = data.model_dump(exclude_none=True)
+    if "ip_address" in fields:
+        fields["ip_address"] = str(fields["ip_address"])
+    if "state" in fields:
+        fields["state"] = fields["state"].value
+    row = update_server_repo(conn, id, fields)
     return ServerOut(**row).model_dump() 
 
 def delete_server_service(conn, id):
