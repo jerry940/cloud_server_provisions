@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 
 from api.app.db.pool import get_conn, put_conn
-from api.app.services.server_service import create_server_service, ValidationError
+from api.app.services.server_service import create_server_service, ValidationError, list_servers_service
 
 
 
@@ -21,7 +21,12 @@ def create_server():
 
 @servers_bp.route('/servers', methods=['GET'])
 def list_servers():
-    pass
+    conn = get_conn()
+    try:
+        result = list_servers_service(conn)
+        return jsonify(result), 200
+    finally:
+        put_conn(conn)
 
 
 @servers_bp.route('/servers/<int:id>', methods=['GET'])

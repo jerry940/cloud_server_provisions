@@ -30,7 +30,7 @@ def _row_to_server(row: Tuple[Any, ...]) -> Dict[str, Any]:
     }
 
 
-def create_server(conn, hostname: str, ip_address: str, state: str) -> Dict[str, Any]:
+def create_server_repo(conn, hostname: str, ip_address: str, state: str) -> Dict[str, Any]:
     """
     Insert one server. Relies on DB constraints for:
       - UNIQUE(hostname)
@@ -62,7 +62,7 @@ def create_server(conn, hostname: str, ip_address: str, state: str) -> Dict[str,
         raise RepoError(str(e))
 
 
-def list_servers(conn) -> List[Dict[str, Any]]:
+def list_servers_repo(conn) -> List[Dict[str, Any]]:
     sql = """
         SELECT id, hostname, ip_address::text, state
         FROM servers
@@ -74,7 +74,7 @@ def list_servers(conn) -> List[Dict[str, Any]]:
     return [_row_to_server(r) for r in rows]
 
 
-def get_server(conn, server_id: int) -> Dict[str, Any]:
+def get_server_repo(conn, server_id: int) -> Dict[str, Any]:
     sql = """
         SELECT id, hostname, ip_address::text, state
         FROM servers
@@ -88,7 +88,7 @@ def get_server(conn, server_id: int) -> Dict[str, Any]:
     return _row_to_server(row)
 
 
-def update_server(conn, server_id: int, fields: Dict[str, Any]) -> Dict[str, Any]:
+def update_server_repo(conn, server_id: int, fields: Dict[str, Any]) -> Dict[str, Any]:
     """
     Partial update (works for PUT/PATCH semantics).
     `fields` can contain: hostname, ip_address, state.
@@ -99,7 +99,7 @@ def update_server(conn, server_id: int, fields: Dict[str, Any]) -> Dict[str, Any
         raise RepoError(f"unknown fields: {sorted(bad)}")
 
     if not fields:
-        return get_server(conn, server_id)
+        return get_server_repo(conn, server_id)
 
     set_clauses = []
     params: List[Any] = []
@@ -149,7 +149,7 @@ def update_server(conn, server_id: int, fields: Dict[str, Any]) -> Dict[str, Any
         raise RepoError(str(e))
 
 
-def delete_server(conn, server_id: int) -> None:
+def delete_server_repo(conn, server_id: int) -> None:
     sql = "DELETE FROM servers WHERE id = %s;"
     with conn.cursor() as cur:
         cur.execute(sql, (server_id,))
