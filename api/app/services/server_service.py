@@ -1,7 +1,7 @@
 
 
 from api.app.models.server import ServerCreate, ServerOut, ServerUpdate
-from api.app.repos.server_repo import create_server_repo, get_server_repo, list_servers_repo, update_server_repo
+from api.app.repos.server_repo import create_server_repo, delete_server_repo, get_server_repo, list_servers_repo, update_server_repo
 
 
 def create_server_service(conn, payload):
@@ -21,3 +21,6 @@ def update_server_service(conn, id, payload):
     data = ServerUpdate.model_validate(payload)
     row = update_server_repo(conn, id, data.hostname, str(data.ip_address), data.state.value)
     return ServerOut(**row).model_dump() 
+
+def delete_server_service(conn, id):
+    delete_server_repo(conn, id)

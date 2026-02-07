@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 
 from api.app.db.pool import get_conn, put_conn
 from api.app.repos.server_repo import DuplicateHostnameError, InvalidIPAddressError, InvalidStateError, NotFoundError, RepoError
-from api.app.services.server_service import create_server_service, ValidationError, get_server_service, list_servers_service, update_server_service
+from api.app.services.server_service import create_server_service, ValidationError, delete_server_service, get_server_service, list_servers_service, update_server_service
 
 
 
@@ -70,6 +70,13 @@ def update_server(id: int):
 
 
 @servers_bp.route('/servers/<int:id>', methods=['DELETE'])
-def delete_server():
-    pass
+def delete_server(id: int):
+    conn = get_conn()
+    try:
+        delete_server_service(conn, id)
+        return "", 204
+    except NotFoundError as e:
+        return jsonify({"error": e.message}), 404
+    finally:
+        put_conn(conn)
 
