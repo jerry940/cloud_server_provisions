@@ -1,7 +1,8 @@
 from flask import Blueprint, request, jsonify
 
 from api.app.db.pool import get_conn, put_conn
-from api.app.services.server_service import create_server_service, ValidationError, list_servers_service
+from api.app.repos.server_repo import NotFoundError
+from api.app.services.server_service import create_server_service, ValidationError, get_server_service, list_servers_service
 
 
 
@@ -30,8 +31,15 @@ def list_servers():
 
 
 @servers_bp.route('/servers/<int:id>', methods=['GET'])
-def get_server():
-    pass
+def get_server(id: int):
+    conn = get_conn()
+    try:
+        result = get_server_service(conn, id)
+        return jsonify(result), 200
+    except NotFoundError as e:
+        return jsonify({"error": str(e)}), 404
+    finally:
+        put_conn(conn)
 
 
 @servers_bp.route('/servers/<int:id>', methods=['PUT'])
